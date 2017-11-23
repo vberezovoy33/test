@@ -44,7 +44,7 @@ if __name__ == "__main__":
 
 
     p_string = sys.argv[1]
-    HOST, PORT = sys.argv[2], sys.argv[3]
+    HOST, PORT = sys.argv[2], int(sys.argv[3])
     source = sys.argv[4]
 
     start_client(p_string, HOST, PORT, source)

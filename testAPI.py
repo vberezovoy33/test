@@ -3,7 +3,7 @@ import json
 
 
 HOST, PORT = "localhost", 9999
-def getChangeData(dateStart, dateEnd, source):
+def getChangeData(dateStart, dateEnd, source = None):
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as sock:
         sock.connect((HOST, PORT))
         sock.sendall(bytes(json.dumps(("request", (dateStart, dateEnd, source))), "utf-8"))

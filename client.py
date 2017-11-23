@@ -33,9 +33,6 @@ def start_client(p_string, HOST, PORT, source):
                 if modif_files:
                     sock.connect((HOST, PORT))
                     sock.sendall(bytes(json.dumps(("entery", modif_files)), "utf-8"))
-
-                    received = str(sock.recv(2024), "utf-8")
-                    print(json.dumps(modif_files));
             old_dict_path = dict_path
 
         time.sleep(2)
@@ -44,7 +41,7 @@ if __name__ == "__main__":
 
 
     p_string = sys.argv[1]
-    HOST, PORT = sys.argv[2], int(sys.argv[3])
+    HOST, PORT = sys.argv[2], sys.argv[3]
     source = sys.argv[4]
 
     start_client(p_string, HOST, PORT, source)

@@ -8,14 +8,18 @@ class MyTCPHandler(socketserver.BaseRequestHandler):
 
     def handle(self):
         self.data = self.request.recv(2024).strip()
-        print("{} wrote:".format(self.client_address[0]))
         status, self.data = json.loads(self.data)
         if status == "entery":
             addRowDb(self.data)
+            print("{} wrote:".format(self.client_address[0]))
             for i in self.data:
                 print(i)
         elif status == "request":
-            print(self.data)
+            if not self.data:
+                return
+            result = getData(*self.data)
+            self.request.sendall(bytes(json.dumps(result), "utf-8"))
+            print(result)
 
 
 class ThreadedTCPServer(socketserver.ThreadingMixIn, socketserver.TCPServer):
@@ -39,6 +43,39 @@ def addRowDb(modif_files):
     else:
         conn.commit()
         conn.close()
+
+def getData(dateStart, dateEnd, source):
+    dateStart = dateStart.replace("T", " ")
+    dateEnd = dateEnd.replace("T", " ")
+
+    if source is not None:
+        source = "and source = {}".format(source)
+    else:
+        source = ""
+
+    sqlScript = """
+                select
+                    source
+                    ,path
+                    ,size
+                    ,status
+                    ,timestamp
+                from files
+                where timestamp between '{}' and '{}' {}"""
+    sqlScript = sqlScript.format(dateStart, dateEnd, source)
+
+    conn = sqlite3.connect('files.db')
+    try:
+        cur = conn.cursor()
+        cur.execute(sqlScript)
+        result = cur.fetchall()
+    except sqlite3.DatabaseError as err:
+        print("Error: ", err)
+    else:
+        conn.commit()
+        conn.close()
+
+    return result
 
 if __name__ == "__main__":
     HOST, PORT = "localhost", 9999
